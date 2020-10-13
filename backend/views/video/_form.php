@@ -1,36 +1,51 @@
 <?php
 
 use yii\helpers\Html;
-use yii\widgets\ActiveForm;
+use yii\bootstrap4\ActiveForm;
 
 /* @var $this yii\web\View */
 /* @var $model common\models\Video */
-/* @var $form yii\widgets\ActiveForm */
+/* @var $form yii\bootstrap4\ActiveForm */
 ?>
 
 <div class="video-form">
 
     <?php $form = ActiveForm::begin(); ?>
 
-    <?= $form->field($model, 'video_id')->textInput(['maxlength' => true]) ?>
+    <div class="row">
+        <div class="col-sm-8">
+            <?= $form->field($model, 'title')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'title')->textInput(['maxlength' => true]) ?>
+            <?= $form->field($model, 'description')->textarea(['rows' => 6]) ?>
 
-    <?= $form->field($model, 'description')->textarea(['rows' => 6]) ?>
+            <?= $form->field($model, 'tags')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'tags')->textInput(['maxlength' => true]) ?>
+        </div>
+        <div class="col-sm-4">
 
-    <?= $form->field($model, 'status')->textInput() ?>
+            <div class="embed-responsive embed-responsive-16by9">
+                <video class="embed-responsive-item"
+                       src="<?php echo $model->getVideoLink()?>" controls>
+                </video>
+            </div>
 
-    <?= $form->field($model, 'has_thumbnail')->textInput() ?>
+            <div class="mb-3">
+                <div class="text-muted">Video Link</div>
+                <a href="<?php echo $model->getVideoLink() ?>">
+                    Open Video
 
-    <?= $form->field($model, 'video_name')->textInput(['maxlength' => true]) ?>
+                </a>
 
-    <?= $form->field($model, 'created_at')->textInput() ?>
+            </div>
 
-    <?= $form->field($model, 'updated_at')->textInput() ?>
+            <div class="mb-3">
+                <div class="text-muted">Video Name</div>
+                <?php echo $model->video_name ?>
+            </div>
 
-    <?= $form->field($model, 'created_by')->textInput() ?>
+            <?= $form->field($model, 'status')->textInput() ?>
+        </div>
+    </div>
 
     <div class="form-group">
         <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>

@@ -3,6 +3,10 @@
 namespace common\models;
 
 use Yii;
+use yii\behaviors\BlameableBehavior;
+use yii\behaviors\TimestampBehavior;
+use yii\helpers\FileHelper;
+use yii\web\UploadedFile;
 
 /**
  * This is the model class for table "{{%video}}".
@@ -22,12 +26,29 @@ use Yii;
  */
 class Video extends \yii\db\ActiveRecord
 {
+    const STATUS_UNLISTED = 0;
+    const STATUS_PUBLISHED = 1;
+    /**
+     * @var \yii\web\UploadedFile
+     */
+    public $video;
     /**
      * {@inheritdoc}
      */
     public static function tableName()
     {
         return '{{%video}}';
+    }
+
+    public function behaviors()
+    {
+        return [
+            TimestampBehavior::class,
+            [
+                'class' => BlameableBehavior::class,
+                'updatedByAttribute' => false
+            ]
+        ];
     }
 
     /**
@@ -42,6 +63,8 @@ class Video extends \yii\db\ActiveRecord
             [['video_id'], 'string', 'max' => 16],
             [['title', 'tags', 'video_name'], 'string', 'max' => 512],
             [['video_id'], 'unique'],
+            ['has_thumbnail', 'default', 'value' => 0],
+            ['status', 'default', 'value' => self::STATUS_UNLISTED],
             [['created_by'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['created_by' => 'id']],
         ];
     }
@@ -82,5 +105,33 @@ class Video extends \yii\db\ActiveRecord
     public static function find()
     {
         return new \common\models\query\VideoQuery(get_called_class());
+    }
+
+    public function save($runValidation = true, $attributeNames = null)
+    {
+        $isInsert = $this->isNewRecord;
+        if ($isInsert){
+            $this->video_id = Yii::$app->security->generateRandomString(8);
+            $this->title = $this->video->name;
+            $this->video_name = $this->video->name;
+
+        }
+        $saved = parent::save($runValidation, $attributeNames);
+        if (!$saved){
+            return false;
+        }
+        if ($isInsert){
+            $videoPath = Yii::getAlias('@frontend/web/storage/videos/'.$this->video_id . '.mp4');
+            if (!is_dir(dirname($videoPath))){
+                FileHelper::createDirectory(dirname($videoPath));
+            }
+            $this->video->saveAs($videoPath);
+        }
+        return true;
+    }
+
+    public function getVideoLink()
+    {
+        return Yii::$app->params['frontendUrl'] . 'storage/videos/' . $this->video_id . '.mp4';
     }
 }
