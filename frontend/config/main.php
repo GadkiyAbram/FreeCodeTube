@@ -10,6 +10,7 @@ return [
     'id' => 'app-frontend',
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
+    'defaultRoute' => '/video/index',
     'controllerNamespace' => 'frontend\controllers',
     'components' => [
         'request' => [
@@ -43,7 +44,9 @@ return [
             'rules' => [
             ],
         ],
-        
+        'assetManager' => [
+            'appendTimestamp' => true
+        ]
     ],
     'params' => $params,
 ];
