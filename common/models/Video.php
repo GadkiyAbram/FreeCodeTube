@@ -10,7 +10,6 @@ use yii\behaviors\BlameableBehavior;
 use yii\behaviors\TimestampBehavior;
 use yii\helpers\FileHelper;
 use yii\imagine\Image;
-use yii\web\UploadedFile;
 
 /**
  * This is the model class for table "{{%video}}".
@@ -27,6 +26,8 @@ use yii\web\UploadedFile;
  * @property int|null $created_by
  *
  * @property User $createdBy
+ * @property VideoLike[] $likes
+ * @property VideoLike[] $dislikes
  */
 class Video extends \yii\db\ActiveRecord
 {
@@ -121,6 +122,18 @@ class Video extends \yii\db\ActiveRecord
         return $this->hasMany(VideoView::class, ['video_id' => 'video_id']);
     }
 
+    public function getLikes()
+    {
+        return $this->hasMany(VideoLike::class, ['video_id' => 'video_id'])
+            ->liked();
+    }
+
+    public function getDislikes()
+    {
+        return $this->hasMany(VideoLike::class, ['video_id' => 'video_id'])
+            ->disliked();
+    }
+
     /**
      * {@inheritdoc}
      * @return \common\models\query\VideoQuery the active query used by this AR class.
@@ -197,6 +210,14 @@ class Video extends \yii\db\ActiveRecord
         return VideoLike::find()
             ->userIdVideoId($userId, $this->video_id)
             ->liked()
+            ->one();
+    }
+
+    public function isDislikedBy($userId)
+    {
+        return VideoLike::find()
+            ->userIdVideoId($userId, $this->video_id)
+            ->disliked()
             ->one();
     }
 }
