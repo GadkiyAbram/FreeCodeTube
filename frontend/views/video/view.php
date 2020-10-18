@@ -2,7 +2,6 @@
 /** @var $model \common\models\Video */
 
 use yii\helpers\Html;
-use yii\helpers\Url;
 use yii\widgets\Pjax;
 
 ?>
@@ -32,9 +31,7 @@ use yii\widgets\Pjax;
         </div>
         <div>
             <p>
-                <?php echo Html::a($model->createdBy->username, [
-                        'channel/view', 'username' => $model->createdBy->username
-                ]) ?>
+                <?php echo \common\helpers\Html::channelLink($model->createdBy) ?>
             </p>
             <?php echo Html::encode($model->description) ?>
         </div>

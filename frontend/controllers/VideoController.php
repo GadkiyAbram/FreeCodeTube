@@ -85,8 +85,6 @@ class VideoController extends Controller
             $this->saveLikeDislike($id, $userId, VideoLike::TYPE_LIKE);
         }
 
-
-
         return $this->renderAjax('_buttons', [
             'model' => $video
         ]);
