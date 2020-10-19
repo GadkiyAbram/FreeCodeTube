@@ -1,5 +1,6 @@
 <?php
 /** @var $model \common\models\Video */
+/** @var $similarVideos \common\models\Video[] */
 
 use yii\helpers\Html;
 use yii\widgets\Pjax;
@@ -37,6 +38,30 @@ use yii\widgets\Pjax;
         </div>
     </div>
     <div class="col-sm-4">
-
+        <?php foreach ($similarVideos as $similarVideo): ?>
+            <div class="media mb-3">
+                <a href="<?php echo \yii\helpers\Url::to(['/video/view', 'id' => $similarVideo->video_id])?>">
+                    <div class="embed-responsive embed-responsive-16by9 mb-3 mr-2"
+                         style="width: 120px">
+                        <video class="embed-responsive-item"
+                               poster="<?php echo $similarVideo->getThumbnailLink() ?>"
+                               src="<?php echo $similarVideo->getVideoLink()?>">
+                        </video>
+                    </div>
+                </a>
+                <div class="media-body">
+                    <h6 class="m-0"><?php echo $similarVideo->title?></h6>
+                    <div class="text-muted">
+                        <p class="m-0">
+                            <?php echo \common\helpers\Html::channelLink($similarVideo->createdBy) ?>
+                        </p>
+                        <small>
+                            <?php echo $similarVideo->getViews()->count() ?> views •
+                            <?php echo Yii::$app->formatter->asRelativeTime($similarVideo->created_at) ?>
+                        </small>
+                    </div>
+                </div>
+            </div>
+        <?php endforeach; ?>
     </div>
 </div>

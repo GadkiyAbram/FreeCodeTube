@@ -62,8 +62,16 @@ class VideoController extends Controller
         $videoView->created_at = time();
         $videoView->save();
 
+        $similarVideos = Video::find()
+            ->published()
+            ->andWhere(['NOT', ['video_id' => $id]])
+            ->byKeyword($video->title)
+            ->limit(10)
+            ->all();
+
         return $this->render('view', [
-            'model' => $video
+            'model' => $video,
+            'similarVideos' => $similarVideos
         ]);
     }
 
@@ -108,10 +116,25 @@ class VideoController extends Controller
             $this->saveLikeDislike($id, $userId, VideoLike::TYPE_DISLIKE);
         }
 
-
-
         return $this->renderAjax('_buttons', [
             'model' => $video
+        ]);
+    }
+
+    public function actionSearch($keyword)
+    {
+        $query = Video::find()
+            ->published()
+            ->latest();
+        if($keyword){
+            $query->byKeyword($keyword);
+        }
+        $dataProvider = new ActiveDataProvider([
+            'query' => $query
+        ]);
+
+        return $this->render('search', [
+            'dataProvider' => $dataProvider
         ]);
     }
 
