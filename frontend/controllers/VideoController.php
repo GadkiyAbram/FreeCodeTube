@@ -3,10 +3,9 @@
 
 namespace frontend\controllers;
 
-
-use app\models\VideoLike;
-use app\models\VideoView;
 use common\models\Video;
+use common\models\VideoLike;
+use common\models\VideoView;
 use yii\data\ActiveDataProvider;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
@@ -23,7 +22,7 @@ class VideoController extends Controller
         return [
             'access' => [
                 'class' =>AccessControl::class,
-                'only' => ['like', 'dislike'],
+                'only' => ['like', 'dislike', 'history'],
                 'rules' => [
                     [
                         'allow' => true,
@@ -44,7 +43,7 @@ class VideoController extends Controller
     public function actionIndex()
     {
         $dataProvider = new ActiveDataProvider([
-            'query' => Video::find()->published()->latest()
+            'query' => Video::find()->with('createdBy')->published()->latest()
         ]);
         return $this->render('index', [
             'dataProvider' => $dataProvider
@@ -134,6 +133,26 @@ class VideoController extends Controller
         ]);
 
         return $this->render('search', [
+            'dataProvider' => $dataProvider
+        ]);
+    }
+
+    public function actionHistory()
+    {
+        $query = Video::find()
+            ->alias('v')
+            ->innerJoin("(SELECT video_id, MAX(created_at) as max_date FROM video_view
+                WHERE user_id = :userId
+                GROUP BY video_id) vv", 'vv.video_id = v.video_id', [
+                    'userId' => \Yii::$app->user->id
+            ])
+            ->orderBy("vv.max_date DESC");
+
+        $dataProvider = new ActiveDataProvider([
+            'query' => $query
+        ]);
+
+        return $this->render('history', [
             'dataProvider' => $dataProvider
         ]);
     }

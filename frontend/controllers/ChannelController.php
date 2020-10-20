@@ -4,11 +4,10 @@
 namespace frontend\controllers;
 
 
-use app\models\Subscriber;
+use common\models\Subscriber;
 use common\models\User;
 use common\models\Video;
 use yii\data\ActiveDataProvider;
-use yii\debug\models\timeline\DataProvider;
 use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;

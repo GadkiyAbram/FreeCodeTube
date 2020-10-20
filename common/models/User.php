@@ -1,7 +1,6 @@
 <?php
 namespace common\models;
 
-use app\models\Subscriber;
 use Yii;
 use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
